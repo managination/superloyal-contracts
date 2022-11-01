@@ -27,7 +27,7 @@ export class SystemUnderTest {
       this.wallets.push(this.provider.getSigner(account));
     }
     this.slu = await this.deployContract(this.wallets[0], "FixSupplyToken",
-        ["SLU", "SuperLoyal Utility token", this.ONE.mul(1e9)]) as FixSupplyToken
+        ["SLU", "SuperLoyal Utility token", [this.accounts[0]], [this.ONE.mul(1e9)]]) as FixSupplyToken
     return true;
   }
 

@@ -12,8 +12,12 @@ contract FixSupplyToken is ERC20 {
   constructor(
     string memory name,
     string memory symbol,
-    uint256 totalSupply
+    address[] memory _initialHolders,
+    uint256[] memory _initialBalances
   ) ERC20(name, symbol) {
-    _mint(msg.sender, totalSupply);
+    require(_initialHolders.length == _initialBalances.length, "arrays must have same lenght");
+    for (uint256 i = 0; i < _initialHolders.length; i++) {
+      _mint(_initialHolders[i], _initialBalances[i]);
+    }
   }
 }

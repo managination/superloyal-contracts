@@ -37,6 +37,69 @@ describe("Tokens", function () {
   });
 
   it("sent all the fixed supply tokens to address 0", async function () {
+    const fixSupplyToken: FixSupplyToken = (await sut.deployContract(sut.wallets[0], "FixSupplyToken", [
+      "Fix Supply Token for Test",
+      "FST",
+      [sut.accounts[0]],
+      [sut.ONE.mul(1e9)]
+    ])) as FixSupplyToken;
+    expect(await fixSupplyToken.balanceOf(sut.accounts[0])).to.equal(sut.ONE.mul(1e9));
+    expect(await fixSupplyToken.totalSupply()).to.equal(sut.ONE.mul(1e9));
+  });
+
+  it("deploys a token contract and mints all the tokens into multiple accounts", async function () {
+    const fixSupplyToken: FixSupplyToken = (await sut.deployContract(sut.wallets[0], "FixSupplyToken", [
+      "Billion Token for Test",
+      "BTT",
+      [sut.accounts[0], sut.accounts[1], sut.accounts[2], sut.accounts[3], sut.accounts[4]],
+      [
+        sut.ONE.mul(2e8),
+        sut.ONE.mul(2e8),
+        sut.ONE.mul(2e8),
+        sut.ONE.mul(2e8),
+        sut.ONE.mul(2e8)
+      ]
+    ])) as FixSupplyToken;
+    await fixSupplyToken.deployed();
+    const tx = await ethers.provider.getTransactionReceipt(fixSupplyToken.deployTransaction.hash);
+    const transfers = sut.getEventsFromReceipt(fixSupplyToken.interface, tx, "Transfer");
+    expect(sut.findTransferEvent(transfers, addressZero, sut.accounts[0], sut.ONE.mul(2e8))).to.not.be.undefined;
+    expect(sut.findTransferEvent(transfers, addressZero, sut.accounts[1], sut.ONE.mul(2e8))).to.not.be.undefined;
+    expect(sut.findTransferEvent(transfers, addressZero, sut.accounts[2], sut.ONE.mul(2e8))).to.not.be.undefined;
+    expect(sut.findTransferEvent(transfers, addressZero, sut.accounts[3], sut.ONE.mul(2e8))).to.not.be.undefined;
+    expect(sut.findTransferEvent(transfers, addressZero, sut.accounts[4], sut.ONE.mul(2e8))).to.not.be.undefined;
+
+    expect(await fixSupplyToken.balanceOf(sut.accounts[0])).to.equal(sut.ONE.mul(2e8));
+    expect(await fixSupplyToken.balanceOf(sut.accounts[1])).to.equal(sut.ONE.mul(2e8));
+    expect(await fixSupplyToken.balanceOf(sut.accounts[2])).to.equal(sut.ONE.mul(2e8));
+    expect(await fixSupplyToken.balanceOf(sut.accounts[3])).to.equal(sut.ONE.mul(2e8));
+    expect(await fixSupplyToken.balanceOf(sut.accounts[4])).to.equal(sut.ONE.mul(2e8));
+
+    expect(await fixSupplyToken.totalSupply()).to.equal(sut.ONE.mul(1e9));
+  });
+
+  it("throws an error if the arrays are not of equal length", async function () {
+    try {
+      const fixSupplyToken = (await sut.deployContract(sut.wallets[0], "FixSupplyToken", [
+        "Billion Token for Test",
+        "BTT",
+        [sut.accounts[0], sut.accounts[1], sut.accounts[2], sut.accounts[3]],
+        [
+          sut.ONE.mul(2e8),
+          sut.ONE.mul(2e8),
+          sut.ONE.mul(2e8),
+          sut.ONE.mul(2e8),
+          sut.ONE.mul(2e8)
+        ]
+      ])) as FixSupplyToken;
+      await fixSupplyToken.deployed();
+      expect(1).to.equal(0, "no error thrown");
+    } catch (err: any) {
+      expect(err.message).to.contain("arrays must have same lenght");
+    }
+  });
+
+  it("sent all the fixed supply tokens to address 0", async function () {
     expect((await sut.slu.balanceOf(sut.accounts[0])).toString()).to.equal(sut.ONE.mul(1e9));
   });
 
