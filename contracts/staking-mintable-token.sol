@@ -37,8 +37,8 @@ contract StakingMintableToken is ERC20, Ownable, AccessControl {
     requiredBalance = _requiredBalance;
   }
 
-  function withdrawStake() public onlyOwner {
-    stakedToken.transfer(msg.sender, stakedToken.balanceOf(address(this)) - requiredBalance);
+  function withdrawStake(uint256 amount) public onlyOwner {
+    stakedToken.transfer(msg.sender, amount);
   }
 
   function grantRole(bytes32 role, address account) public override onlyRole(getRoleAdmin(role)) {

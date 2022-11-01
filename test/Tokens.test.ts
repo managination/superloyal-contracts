@@ -149,6 +149,18 @@ describe("Tokens", function () {
       ).to.be.revertedWith("address is missing MINTER_ROLE");
     });
 
+    it("the stake can be withdrawn by the owner", async function() {
+      await expect(mintableToken.withdrawStake(sut.ONE.mul(5e5)))
+          .to.emit(sut.slu, "Transfer")
+          .withArgs(mintableToken.address, brandAddress, sut.ONE.mul(5e5))
+    })
+
+    it("if the stake is withdrawn by the owner minting is blocked", async function() {
+      await mintableToken.withdrawStake(sut.ONE.mul(5e5))
+      await expect(mintableToken.mint(sut.accounts[2], sut.ONE))
+          .to.be.revertedWith("insufficient stake for minting");
+    })
+
   })
 
 });
