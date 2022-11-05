@@ -11,7 +11,7 @@ interface DeploymentsMap {
 
 const {ethers} = require("hardhat");
 
-const gasSettings = {gasPrice: "1000000000"}; //{maxFeePerGas: "300", maxPriorityFeePerGas: "10"}
+// const gasSettings = {gasPrice: "1000000000"}; //{maxFeePerGas: "300", maxPriorityFeePerGas: "10"}
 //used to keep code small and pretty
 const deploymentResults: DeploymentsMap = {};
 
@@ -29,7 +29,7 @@ function getDeployFunction(basicDeployFunction: DeploymentFunction) {
       from: deployer,
       args: args,
       log: true,
-      ...gasSettings
+      // ...gasSettings
     });
     deploymentResults[deploymentName] = result;
     // @ts-ignore
@@ -46,8 +46,8 @@ module.exports = async ({deployments, network}: HardhatRuntimeEnvironment) => {
 
   const accounts = await ethers.provider.listAccounts();
   const deployer = accounts[0];
-  const sl = accounts[1];
-  const minter = accounts[2];
+  const sl = accounts[1] || "0xB2C0ab2E4f224031f069cCf20Aef9f06f32D177A";
+  const minter = accounts[2] || "0xB2C0ab2E4f224031f069cCf20Aef9f06f32D177A";
 
   const slu = await deployAndGetContract("FixSupplyToken", deployer,
       [
