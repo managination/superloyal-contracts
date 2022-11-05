@@ -6,6 +6,7 @@ import { ethers } from "hardhat";
 import { SystemUnderTest } from "./utils/SystemUnderTest";
 import { Signer } from "ethers";
 import { addressZero } from "./utils/helpers";
+import exp = require("constants");
 
 use(solidity);
 
@@ -123,13 +124,20 @@ describe("Tokens", function () {
         .to.be.revertedWith("insufficient stake for minting");
   })
 
+  it("indicats that minting is disabled", async function() {
+    expect(await mintableToken.canMint()).to.be.false
+  })
+
   describe("after providing stake", function () {
 
     beforeEach(async function() {
       await (await sut.slu.transfer(mintableToken.address, sut.ONE.mul(1e6)))
     })
 
-    // Test case
+    it("indicats that minting is enabled", async function() {
+      expect(await mintableToken.canMint()).to.be.true
+    })
+
     it("owner can mint new mintable tokens", async function () {
       await expect(mintableToken.mint(sut.accounts[2], sut.ONE.mul(10000)))
           .to.emit(mintableToken, "Transfer")

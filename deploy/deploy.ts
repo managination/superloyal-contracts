@@ -67,6 +67,9 @@ module.exports = async ({deployments, network}: HardhatRuntimeEnvironment) => {
       ],
       "BP") as StakingMintableToken;
   await bp.addMinter(minter)
+  await (await slu.connect((await ethers.getSigners())[1]).transfer(bp.address, DECIMAL_PRECISION.mul(1e6))).wait();
+  console.log(`minting is enabled ${await bp.canMint()}`)
   console.log(`SLU deployed to ${slu.address}`)
   console.log(`BP deployed to ${bp.address}`)
+
 }

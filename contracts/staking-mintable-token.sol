@@ -32,6 +32,10 @@ contract StakingMintableToken is ERC20, Ownable, AccessControl {
     addMinter(msg.sender);
   }
 
+  function canMint() public view returns (bool) {
+    return stakedToken.balanceOf(address(this)) >= requiredBalance;
+  }
+
   function setRequiredBalance(uint256 _requiredBalance) public {
     require(msg.sender == superloyal, "only superloyal can change the required stake");
     requiredBalance = _requiredBalance;
