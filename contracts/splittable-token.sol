@@ -64,7 +64,7 @@ contract SplittableToken is ERC20, Ownable {
     return super.balanceOf(_account) * (2**(exponent - userExponents[_account]));
   }
 
-  /// @dev the supply is increased by the multiplier: The multiplier always refers to the initialSupply
+  /// @dev the supply is doubled
   function increaseSupply() public onlyOwner {
     exponent += 1;
     emit IncreaseSupply(exponent);

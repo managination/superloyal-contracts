@@ -46,14 +46,14 @@ module.exports = async ({deployments, network}: HardhatRuntimeEnvironment) => {
 
   const accounts = await ethers.provider.listAccounts();
   const deployer = accounts[0];
-  const sl = accounts[1] || "0xB2C0ab2E4f224031f069cCf20Aef9f06f32D177A";
+  const sl = accounts[1];
   const minter = accounts[2] || "0xB2C0ab2E4f224031f069cCf20Aef9f06f32D177A";
 
   const slu = await deployAndGetContract("FixSupplyToken", deployer,
       [
         "Super Loyal Utility Token",
         "SLU",
-        [sl], [DECIMAL_PRECISION.mul(1e9)]
+        [sl || accounts[0]], [DECIMAL_PRECISION.mul(1e9)]
       ], "SLU") as FixSupplyToken;
   const bp = await deployAndGetContract(
       "StakingMintableToken",
@@ -61,13 +61,15 @@ module.exports = async ({deployments, network}: HardhatRuntimeEnvironment) => {
       [
         "Test Brand Token",
         "BPT",
-        sl,
+        sl || "0xB2C0ab2E4f224031f069cCf20Aef9f06f32D177A",
         slu.address,
         DECIMAL_PRECISION.mul(1e6)
       ],
       "BP") as StakingMintableToken;
   await bp.addMinter(minter)
-  await (await slu.connect((await ethers.getSigners())[1]).transfer(bp.address, DECIMAL_PRECISION.mul(1e6))).wait();
+  if(!(await bp.canMint())) {
+    await ( await slu.connect(( await ethers.getSigners() )[1] || ( await ethers.getSigners() )[0]).transfer(bp.address, DECIMAL_PRECISION.mul(1e6)) ).wait();
+  }
   console.log(`minting is enabled ${await bp.canMint()}`)
   console.log(`SLU deployed to ${slu.address}`)
   console.log(`BP deployed to ${bp.address}`)
